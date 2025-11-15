@@ -1,5 +1,5 @@
 // lib/data/models/anime_model.dart
-class Anime {
+class AnimeModel {
   final int malId;
   final String title;
   final String imageUrl;
@@ -9,7 +9,7 @@ class Anime {
   final String? trailerUrl;
   final List<String> genres;
 
-  Anime({
+  AnimeModel({
     required this.malId,
     required this.title,
     required this.imageUrl,
@@ -20,7 +20,7 @@ class Anime {
     this.genres = const [],
   });
 
-  factory Anime.fromJson(Map<String, dynamic> json) {
+  factory AnimeModel.fromJson(Map<String, dynamic> json) {
     final images = json['images'] ?? {};
     final jpg = images['jpg'] ?? {};
     final imageUrl = jpg['image_url'] ?? jpg['large_image_url'] ?? '';
@@ -38,7 +38,7 @@ class Anime {
       }
     }
 
-    return Anime(
+    return AnimeModel(
       malId: json['mal_id'] ?? json['id'] ?? 0,
       title: json['title'] ?? json['title_english'] ?? 'Unknown',
       imageUrl: imageUrl as String,

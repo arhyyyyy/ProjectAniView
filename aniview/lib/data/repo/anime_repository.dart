@@ -5,12 +5,16 @@ class AnimeRepository {
   final ApiService apiService;
   AnimeRepository({required this.apiService});
 
-  Future<List<Anime>> getTopAnime({int page = 1}) =>
+  Future<List<AnimeModel>> getTopAnime({int page = 1}) =>
       apiService.fetchTopAnime(page: page);
 
-  Future<List<Anime>> searchAnime(String query) =>
+  Future<List<AnimeModel>> searchAnime(String query) =>
       apiService.searchAnime(query);
 
-  Future<Anime> getAnimeDetail(int malId) =>
+  Future<AnimeModel> getAnimeDetail(int malId) =>
       apiService.getAnimeDetail(malId);
+
+  // ⭐ NEW: Latest Anime
+  Future<List<AnimeModel>> getLatestAnime() =>
+      apiService.fetchLatestAnime();
 }

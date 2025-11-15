@@ -2,9 +2,51 @@
 import 'package:aniview/ui/themes/colors.dart';
 import 'package:aniview/ui/views/auth/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
+
+  Future<void> register(BuildContext context, String name, String email, String password) async {
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email.trim(),
+        password: password.trim(),
+      );
+      await userCredential.user!.updateDisplayName(name);
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Registration successful!", style: TextStyle(color: Colors.white)),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Future.delayed(const Duration(milliseconds: 400), () {
+        Navigator.pushReplacement(
+          // ignore: use_build_context_synchronously
+          context,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+      });
+    } on FirebaseAuthException catch (e) {
+      String message = "Something went wrong.";
+      if (e.code == "email-already-in-use") {
+        message = "Email is already registered.";
+      } else if (e.code == "invalid-email") {
+        message = "Invalid email format.";
+      } else if (e.code == "weak-password") {
+        message = "Password is too weak.";
+      }
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message, style: const TextStyle(color: Colors.white)),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +83,6 @@ class RegisterScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
@@ -55,7 +96,6 @@ class RegisterScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -76,8 +116,6 @@ class RegisterScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 28),
-
-                      // NAME
                       TextField(
                         controller: nameCtrl,
                         decoration: InputDecoration(
@@ -93,8 +131,6 @@ class RegisterScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
-
-                      // EMAIL
                       TextField(
                         controller: emailCtrl,
                         decoration: InputDecoration(
@@ -110,8 +146,6 @@ class RegisterScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
-
-                      // PASSWORD
                       TextField(
                         controller: passCtrl,
                         obscureText: true,
@@ -127,9 +161,7 @@ class RegisterScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 24),
-
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -141,24 +173,12 @@ class RegisterScreen extends StatelessWidget {
                             ),
                           ),
                           onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  "Registration successful",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                backgroundColor: Colors.green,
-                              ),
+                            register(
+                              context,
+                              nameCtrl.text,
+                              emailCtrl.text,
+                              passCtrl.text,
                             );
-                            Future.delayed(Duration(milliseconds: 300), () {
-                              Navigator.push(
-                                // ignore: use_build_context_synchronously
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const LoginScreen(),
-                                ),
-                              );
-                            });
                           },
                           child: const Text(
                             "Register",
@@ -170,7 +190,6 @@ class RegisterScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 18),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,

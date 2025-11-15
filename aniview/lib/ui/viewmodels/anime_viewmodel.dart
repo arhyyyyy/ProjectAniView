@@ -12,12 +12,22 @@ class AnimeViewModel extends ChangeNotifier {
 
   ViewState _state = ViewState.idle;
   String? _errorMessage;
-  List<Anime> _animes = [];
+
+  // TOP Anime
+  List<AnimeModel> _animes = [];
+  List<AnimeModel> get animes => _animes;
+
+  // ⭐ ADD THIS — getter supaya HomePage bisa akses topAnimes
+  List<AnimeModel> get topAnimes => _animes;
+
+  // Latest Anime
+  List<AnimeModel> _latestAnimes = [];
+  List<AnimeModel> get latestAnimes => _latestAnimes;
 
   ViewState get state => _state;
   String? get errorMessage => _errorMessage;
-  List<Anime> get animes => _animes;
 
+  // 🚀 Fetch Top Anime
   Future<void> fetchTopAnime({int page = 1}) async {
     _setState(ViewState.busy);
     try {
@@ -30,6 +40,20 @@ class AnimeViewModel extends ChangeNotifier {
     }
   }
 
+  // ⭐ Fetch Latest Anime
+  Future<void> fetchLatestAnime() async {
+    _setState(ViewState.busy);
+    try {
+      final data = await repository.getLatestAnime();
+      _latestAnimes = data;
+      _setState(ViewState.idle);
+    } catch (e) {
+      _errorMessage = e.toString();
+      _setState(ViewState.error);
+    }
+  }
+
+  // 🔍 Search Anime
   Future<void> search(String query) async {
     _setState(ViewState.busy);
     try {
@@ -42,6 +66,7 @@ class AnimeViewModel extends ChangeNotifier {
     }
   }
 
+  // 🎛 State Handler
   void _setState(ViewState s) {
     _state = s;
     notifyListeners();

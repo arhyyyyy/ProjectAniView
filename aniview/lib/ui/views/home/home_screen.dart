@@ -1,36 +1,56 @@
-// lib/ui/views/home/home_screen.dart
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../viewmodels/anime_viewmodel.dart';
-import '../../widgets/anime_card.dart';
+import 'home_page.dart';
+import 'bookmark_page.dart';
+import 'rating_page.dart';
+import 'profile_page.dart';
+import 'package:aniview/ui/themes/colors.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final vm = context.watch<AnimeViewModel>();
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
+  int index = 0;
+
+  final pages = const [
+    HomePage(),
+    BookmarkPage(),
+    RatingPage(),
+    ProfilePage(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('AniLive')),
-      body: Builder(builder: (context) {
-        if (vm.state == ViewState.busy) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (vm.state == ViewState.error) {
-          return Center(child: Text('Error: ${vm.errorMessage}'));
-        } else if (vm.animes.isEmpty) {
-          return const Center(child: Text('No anime found.'));
-        } else {
-          return ListView.builder(
-            padding: const EdgeInsets.all(12),
-            itemCount: vm.animes.length,
-            itemBuilder: (context, idx) {
-              final anime = vm.animes[idx];
-              return AnimeCard(anime: anime);
-            },
-          );
-        }
-      }),
+      body: pages[index],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: index,
+        selectedItemColor: AppColors.bluePrimary,
+        unselectedItemColor: Colors.grey,
+        type: BottomNavigationBarType.fixed,
+        onTap: (i) => setState(() => index = i),
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            label: "Home",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bookmark_border),
+            label: "Bookmark",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.star_border),
+            label: "Rating",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: "Profile",
+          ),
+        ],
+      ),
     );
   }
 }

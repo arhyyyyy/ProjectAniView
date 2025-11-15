@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../data/models/anime_model.dart';
 
 class AnimeCard extends StatelessWidget {
-  final Anime anime;
+  final AnimeModel anime;
   const AnimeCard({super.key, required this.anime});
 
   @override
@@ -20,7 +20,7 @@ class AnimeCard extends StatelessWidget {
             height: 80,
             fit: BoxFit.cover,
             placeholder: (c, _) => const SizedBox(width: 56, height: 80, child: Center(child: CircularProgressIndicator())),
-            errorWidget: (c, _, __) => const Icon(Icons.broken_image),
+            errorWidget: (c, _, _) => const Icon(Icons.broken_image),
           ),
         ),
         title: Text(anime.title),

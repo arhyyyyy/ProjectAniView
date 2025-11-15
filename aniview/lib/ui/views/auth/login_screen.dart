@@ -4,15 +4,53 @@ import 'package:aniview/ui/views/auth/forget_pw.dart';
 import 'package:aniview/ui/views/auth/register_screen.dart';
 import 'package:aniview/ui/views/home/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
+  Future<void> login(BuildContext context, String email, String password) async {
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email.trim(),
+        password: password.trim(),
+      );
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Login success!", style: TextStyle(color: Colors.white)),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Future.delayed(const Duration(milliseconds: 400), () {
+        Navigator.pushReplacement(
+          // ignore: use_build_context_synchronously
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+      });
+    } on FirebaseAuthException catch (e) {
+      String msg = "Login failed.";
+      if (e.code == "user-not-found") {
+        msg = "Email is not registered.";
+      } else if (e.code == "wrong-password") {
+        msg = "Incorrect password.";
+      } else if (e.code == "invalid-email") {
+        msg = "Invalid email format.";
+      }
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(msg, style: const TextStyle(color: Colors.white)),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
   @override
   Widget build(BuildContext context) {
     final emailCtrl = TextEditingController();
     final passCtrl = TextEditingController();
-
     return Scaffold(
       body: Container(
         color: AppColors.bluePastel,
@@ -45,7 +83,7 @@ class LoginScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Colors.white, // lebih kontras & modern
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
@@ -105,17 +143,19 @@ class LoginScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 12),
                       Align(
                         alignment: Alignment.centerRight,
                         child: GestureDetector(
                           onTap: () {
-                             Navigator.push(context, 
+                            Navigator.push(
+                              context,
                               MaterialPageRoute(
-                                builder: (context) => const ForgetPasswordScreen()),
+                                builder: (context) =>
+                                    const ForgetPasswordScreen(),
+                              ),
                             );
-                            },
+                          },
                           child: Text(
                             "Forgot Password?",
                             style: TextStyle(
@@ -125,7 +165,6 @@ class LoginScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 24),
                       SizedBox(
                         width: double.infinity,
@@ -139,9 +178,10 @@ class LoginScreen extends StatelessWidget {
                             elevation: 2,
                           ),
                           onPressed: () {
-                            Navigator.push(context, 
-                              MaterialPageRoute(
-                                builder: (context) => const HomeScreen()),
+                            login(
+                              context,
+                              emailCtrl.text,
+                              passCtrl.text,
                             );
                           },
                           child: const Text(
@@ -154,7 +194,6 @@ class LoginScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 18),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -162,10 +201,13 @@ class LoginScreen extends StatelessWidget {
                           Text("Don't have an account? "),
                           GestureDetector(
                             onTap: () {
-                             Navigator.push(context, 
-                              MaterialPageRoute(
-                                builder: (context) => const RegisterScreen()),
-                            );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const RegisterScreen(),
+                                ),
+                              );
                             },
                             child: Text(
                               "Register",

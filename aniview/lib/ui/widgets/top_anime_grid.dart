@@ -1,0 +1,90 @@
+import 'package:aniview/ui/themes/colors.dart';
+import 'package:flutter/material.dart';
+import 'package:aniview/data/models/anime_model.dart';
+
+class TopAnimeGrid extends StatelessWidget {
+  final List<AnimeModel> items;
+  final Function(AnimeModel) onTap;
+
+  const TopAnimeGrid({
+    super.key,
+    required this.items,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: items.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 0.62,
+      ),
+      itemBuilder: (context, index) {
+        final anime = items[index];
+
+        return GestureDetector(
+          onTap: () => onTap(anime),
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.softGray,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 6,
+                  offset: Offset(0, 3),
+                )
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                  child: Image.network(
+                    anime.imageUrl,
+                    height: 170,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Text(
+                    anime.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.star, size: 16, color: Colors.amber),
+                      const SizedBox(width: 4),
+                      Text(
+                        anime.score?.toString() ?? "-",
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
