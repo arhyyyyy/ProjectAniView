@@ -1,4 +1,5 @@
 import 'package:aniview/ui/viewmodels/anime_viewmodel.dart';
+import 'package:aniview/ui/views/pages/anime_detail_screen_page.dart';
 import 'package:aniview/ui/widgets/app_drawer.dart' show AppDrawer;
 import 'package:aniview/ui/widgets/latest_anime_grid.dart';
 import 'package:aniview/ui/widgets/search.dart';
@@ -116,7 +117,14 @@ class _HomePageState extends State<HomePage> {
                         const SizedBox(height: 12),
                         LatestAnimeGrid(
                           items: vm.latestAnimes,
-                          onTap: (anime) {},
+                         onTap: (anime) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => AnimeDetailScreen(malId: anime.malId),
+                            ),
+                          );
+                        },
                         ),
                         const SizedBox(height: 24),
                         Text(
@@ -128,10 +136,17 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        TopAnimeGrid(
-                          items: vm.topAnimes,
-                          onTap: (anime) {},
-                        ),
+                      TopAnimeGrid(
+                        items: vm.topAnimes,
+                        onTap: (anime) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => AnimeDetailScreen(malId: anime.malId),
+                            ),
+                          );
+                        },
+                      ),
                         const SizedBox(height: 40),
                       ],
                     ),

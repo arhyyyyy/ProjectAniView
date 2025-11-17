@@ -7,7 +7,6 @@ import 'package:aniview/ui/viewmodels/register_viewmodel.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import 'di/locator.dart';
 import 'ui/viewmodels/anime_viewmodel.dart';
 import 'ui/viewmodels/auth_viewmodel.dart';

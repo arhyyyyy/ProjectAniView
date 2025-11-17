@@ -44,16 +44,26 @@ class TopAnimeGrid extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // IMAGE
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(14)),
                   child: Image.network(
                     anime.imageUrl,
                     height: 170,
                     width: double.infinity,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stack) {
+                      return Container(
+                        height: 170,
+                        color: Colors.grey.shade300,
+                        child: const Icon(Icons.broken_image, size: 40),
+                      );
+                    },
                   ),
                 ),
 
+                // TITLE
                 Padding(
                   padding: const EdgeInsets.all(8),
                   child: Text(
@@ -67,6 +77,7 @@ class TopAnimeGrid extends StatelessWidget {
                   ),
                 ),
 
+                // SCORE
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Row(
@@ -74,10 +85,37 @@ class TopAnimeGrid extends StatelessWidget {
                       const Icon(Icons.star, size: 16, color: Colors.amber),
                       const SizedBox(width: 4),
                       Text(
-                        anime.score?.toString() ?? "-",
+                        anime.score?.toStringAsFixed(1) ?? "-",
                         style: const TextStyle(fontSize: 13),
                       ),
                     ],
+                  ),
+                ),
+
+                // TYPE + EPS
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  child: Text(
+                    "${anime.type ?? 'N/A'} • ${anime.episodes ?? '?'} eps",
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.black54,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+
+                // YEAR
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    anime.year != null ? anime.year.toString() : "Unknown Year",
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.black45,
+                    ),
                   ),
                 ),
               ],

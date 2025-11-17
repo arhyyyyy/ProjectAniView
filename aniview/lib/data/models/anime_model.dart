@@ -1,4 +1,3 @@
-// lib/data/models/anime_model.dart
 class AnimeModel {
   final int malId;
   final String title;
@@ -9,6 +8,9 @@ class AnimeModel {
   final String? trailerUrl;
   final List<String> genres;
 
+  final String? type;
+  final int? year;
+
   AnimeModel({
     required this.malId,
     required this.title,
@@ -18,35 +20,58 @@ class AnimeModel {
     this.episodes,
     this.trailerUrl,
     this.genres = const [],
+    this.type,
+    this.year,
   });
 
   factory AnimeModel.fromJson(Map<String, dynamic> json) {
-    final images = json['images'] ?? {};
-    final jpg = images['jpg'] ?? {};
-    final imageUrl = jpg['image_url'] ?? jpg['large_image_url'] ?? '';
+    // ================ IMAGE ================
+    final images = json["images"] ?? {};
+    final jpg = images["jpg"] ?? {};
+    final imageUrl = jpg["large_image_url"] ??
+        jpg["image_url"] ??
+        ""; // prevent null
 
-    // trailer may be nested
+    // ================ TRAILER (embed_url) ================
     String? trailer;
-    if (json['trailer'] != null && json['trailer']['url'] != null) {
-      trailer = json['trailer']['url'];
+    if (json["trailer"] != null && json["trailer"]["embed_url"] != null) {
+      trailer = json["trailer"]["embed_url"];
     }
 
+    // ================ GENRES ================
     final genresList = <String>[];
-    if (json['genres'] != null && json['genres'] is List) {
-      for (var g in json['genres']) {
-        if (g['name'] != null) genresList.add(g['name']);
+    if (json["genres"] is List) {
+      for (var g in json["genres"]) {
+        if (g["name"] != null) genresList.add(g["name"]);
       }
     }
 
+    // ================ TYPE ================
+    final type = json["type"];
+
+    // ================ YEAR (fallback aired.year) ================
+    final year = json["year"] ??
+        json["aired"]?["prop"]?["from"]?["year"];
+
+    // ================ TITLE ================
+    final title = json["title"] ??
+        json["title_english"] ??
+        json["title_japanese"] ??
+        "Unknown";
+
     return AnimeModel(
-      malId: json['mal_id'] ?? json['id'] ?? 0,
-      title: json['title'] ?? json['title_english'] ?? 'Unknown',
-      imageUrl: imageUrl as String,
-      synopsis: json['synopsis'] ?? '',
-      score: (json['score'] != null) ? (json['score'] as num).toDouble() : null,
-      episodes: json['episodes'],
+      malId: json["mal_id"] ?? 0,
+      title: title,
+      imageUrl: imageUrl,
+      synopsis: json["synopsis"] ?? "-",
+      score: json["score"] != null
+          ? (json["score"] as num).toDouble()
+          : null,
+      episodes: json["episodes"],
       trailerUrl: trailer,
       genres: genresList,
+      type: type,
+      year: year,
     );
   }
 }
