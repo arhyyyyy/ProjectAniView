@@ -9,11 +9,17 @@ final GetIt locator = GetIt.instance;
 
 void setupLocator() {
   // Services
-  locator.registerLazySingleton<ApiService>(() => ApiService(client: http.Client()));
+  locator.registerLazySingleton<ApiService>(
+    () => ApiService(client: http.Client()),
+  );
 
   // Repositories
-  locator.registerLazySingleton<AnimeRepository>(() => AnimeRepository(apiService: locator()));
+  locator.registerLazySingleton<AnimeRepository>(
+    () => AnimeRepository(apiService: locator()),
+  );
 
   // ViewModels
-  locator.registerFactory<AnimeViewModel>(() => AnimeViewModel(repository: locator()));
+  locator.registerFactory<AnimeViewModel>(
+    () => AnimeViewModel(repository: locator()),
+  );
 }

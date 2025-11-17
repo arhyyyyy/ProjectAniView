@@ -15,7 +15,7 @@ class RegisterScreen extends StatelessWidget {
         password: password.trim(),
       );
       await userCredential.user!.updateDisplayName(name);
-      // ignore: use_build_context_synchronously
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Registration successful!", style: TextStyle(color: Colors.white)),
@@ -24,7 +24,7 @@ class RegisterScreen extends StatelessWidget {
       );
       Future.delayed(const Duration(milliseconds: 400), () {
         Navigator.pushReplacement(
-          // ignore: use_build_context_synchronously
+
           context,
           MaterialPageRoute(builder: (_) => const LoginScreen()),
         );
@@ -38,7 +38,7 @@ class RegisterScreen extends StatelessWidget {
       } else if (e.code == "weak-password") {
         message = "Password is too weak.";
       }
-      // ignore: use_build_context_synchronously
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(message, style: const TextStyle(color: Colors.white)),

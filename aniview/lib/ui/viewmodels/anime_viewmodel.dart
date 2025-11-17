@@ -1,4 +1,3 @@
-// lib/ui/viewmodels/anime_viewmodel.dart
 import 'package:aniview/data/repo/anime_repository.dart';
 import 'package:flutter/material.dart';
 import '../../data/models/anime_model.dart';
@@ -9,25 +8,18 @@ class AnimeViewModel extends ChangeNotifier {
   final AnimeRepository repository;
 
   AnimeViewModel({required this.repository});
-
   ViewState _state = ViewState.idle;
   String? _errorMessage;
-
-  // TOP Anime
   List<AnimeModel> _animes = [];
   List<AnimeModel> get animes => _animes;
-
-  // ⭐ ADD THIS — getter supaya HomePage bisa akses topAnimes
   List<AnimeModel> get topAnimes => _animes;
-
-  // Latest Anime
   List<AnimeModel> _latestAnimes = [];
   List<AnimeModel> get latestAnimes => _latestAnimes;
 
   ViewState get state => _state;
   String? get errorMessage => _errorMessage;
 
-  // 🚀 Fetch Top Anime
+
   Future<void> fetchTopAnime({int page = 1}) async {
     _setState(ViewState.busy);
     try {
@@ -40,7 +32,7 @@ class AnimeViewModel extends ChangeNotifier {
     }
   }
 
-  // ⭐ Fetch Latest Anime
+
   Future<void> fetchLatestAnime() async {
     _setState(ViewState.busy);
     try {
@@ -53,7 +45,7 @@ class AnimeViewModel extends ChangeNotifier {
     }
   }
 
-  // 🔍 Search Anime
+
   Future<void> search(String query) async {
     _setState(ViewState.busy);
     try {
@@ -66,7 +58,7 @@ class AnimeViewModel extends ChangeNotifier {
     }
   }
 
-  // 🎛 State Handler
+
   void _setState(ViewState s) {
     _state = s;
     notifyListeners();

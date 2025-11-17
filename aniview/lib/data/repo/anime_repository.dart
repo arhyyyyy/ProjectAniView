@@ -14,7 +14,6 @@ class AnimeRepository {
   Future<AnimeModel> getAnimeDetail(int malId) =>
       apiService.getAnimeDetail(malId);
 
-  // ⭐ NEW: Latest Anime
   Future<List<AnimeModel>> getLatestAnime() =>
       apiService.fetchLatestAnime();
 }

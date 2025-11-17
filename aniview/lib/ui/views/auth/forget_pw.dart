@@ -18,7 +18,6 @@ class ForgetPasswordScreen extends StatelessWidget {
 
         child: Stack(
           children: [
-            // === BACK ARROW FIXED DI PALING ATAS ===
             Positioned(
               top: 40,
               left: 20,
@@ -28,16 +27,12 @@ class ForgetPasswordScreen extends StatelessWidget {
                 onPressed: () => Navigator.pop(context),
               ),
             ),
-
-            // === CONTENT SCROLLABLE ===
             Center(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   children: [
-                    const SizedBox(height: 80), // jarak supaya arrow tidak ketiban
-
-                    // Logo + Title
+                    const SizedBox(height: 80),
                     Column(
                       children: [
                         Image.asset("assets/logo.png",
@@ -53,10 +48,7 @@ class ForgetPasswordScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 20),
-
-                    // Card Form
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(

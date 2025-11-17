@@ -15,16 +15,16 @@ class LoginScreen extends StatelessWidget {
         email: email.trim(),
         password: password.trim(),
       );
-      // ignore: use_build_context_synchronously
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Login success!", style: TextStyle(color: Colors.white)),
           backgroundColor: Colors.green,
         ),
       );
-      Future.delayed(const Duration(milliseconds: 400), () {
+      Future.delayed(const Duration(milliseconds: 100), () {
         Navigator.pushReplacement(
-          // ignore: use_build_context_synchronously
+
           context,
           MaterialPageRoute(builder: (_) => const HomeScreen()),
         );
@@ -38,7 +38,7 @@ class LoginScreen extends StatelessWidget {
       } else if (e.code == "invalid-email") {
         msg = "Invalid email format.";
       }
-      // ignore: use_build_context_synchronously
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(msg, style: const TextStyle(color: Colors.white)),
