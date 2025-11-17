@@ -1,56 +1,21 @@
-// lib/ui/views/auth/login_screen.dart
-import 'package:aniview/ui/themes/colors.dart';
-import 'package:aniview/ui/views/auth/forget_pw.dart';
-import 'package:aniview/ui/views/auth/register_screen.dart';
-import 'package:aniview/ui/views/home/home_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+
+import '../../../ui/viewmodels/login_viewmodel.dart';
+import '../../themes/colors.dart';
+import '../pages/home_screen.dart';
+import 'forget_pw.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
-  Future<void> login(BuildContext context, String email, String password) async {
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email.trim(),
-        password: password.trim(),
-      );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Login success!", style: TextStyle(color: Colors.white)),
-          backgroundColor: Colors.green,
-        ),
-      );
-      Future.delayed(const Duration(milliseconds: 100), () {
-        Navigator.pushReplacement(
-
-          context,
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
-        );
-      });
-    } on FirebaseAuthException catch (e) {
-      String msg = "Login failed.";
-      if (e.code == "user-not-found") {
-        msg = "Email is not registered.";
-      } else if (e.code == "wrong-password") {
-        msg = "Incorrect password.";
-      } else if (e.code == "invalid-email") {
-        msg = "Invalid email format.";
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(msg, style: const TextStyle(color: Colors.white)),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
   @override
   Widget build(BuildContext context) {
+    final vm = Provider.of<LoginViewModel>(context);
     final emailCtrl = TextEditingController();
     final passCtrl = TextEditingController();
+
     return Scaffold(
       body: Container(
         color: AppColors.bluePastel,
@@ -85,11 +50,11 @@ class LoginScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
+                    boxShadow: const [
                       BoxShadow(
                         color: Colors.black12,
                         blurRadius: 14,
-                        offset: const Offset(0, 6),
+                        offset: Offset(0, 6),
                       ),
                     ],
                   ),
@@ -113,36 +78,48 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 28),
+
+                      /// email
                       TextField(
                         controller: emailCtrl,
                         decoration: InputDecoration(
                           labelText: "Email",
                           filled: true,
-                          fillColor: AppColors.bluePastel.withValues(alpha: .8),
-                          prefixIcon: Icon(Icons.email,
-                              color: AppColors.bluePrimary),
+                          fillColor:
+                              AppColors.bluePastel.withValues(alpha: .8),
+                          prefixIcon: Icon(
+                            Icons.email,
+                            color: AppColors.bluePrimary,
+                          ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
                           ),
                         ),
                       ),
+
                       const SizedBox(height: 16),
+
+                      /// password
                       TextField(
                         controller: passCtrl,
                         obscureText: true,
                         decoration: InputDecoration(
                           labelText: "Password",
                           filled: true,
-                          fillColor: AppColors.bluePastel.withValues(alpha: .8),
-                          prefixIcon: Icon(Icons.lock,
-                              color: AppColors.bluePrimary),
+                          fillColor:
+                              AppColors.bluePastel.withValues(alpha: .8),
+                          prefixIcon: Icon(
+                            Icons.lock,
+                            color: AppColors.bluePrimary,
+                          ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
                           ),
                         ),
                       ),
+
                       const SizedBox(height: 12),
                       Align(
                         alignment: Alignment.centerRight,
@@ -151,8 +128,7 @@ class LoginScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const ForgetPasswordScreen(),
+                                builder: (_) => const ForgetPasswordScreen(),
                               ),
                             );
                           },
@@ -165,7 +141,10 @@ class LoginScreen extends StatelessWidget {
                           ),
                         ),
                       ),
+
                       const SizedBox(height: 24),
+
+                      /// LOGIN BUTTON MVVM
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -177,35 +156,62 @@ class LoginScreen extends StatelessWidget {
                             ),
                             elevation: 2,
                           ),
-                          onPressed: () {
-                            login(
-                              context,
-                              emailCtrl.text,
-                              passCtrl.text,
-                            );
-                          },
-                          child: const Text(
-                            "Login",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          onPressed: vm.isLoading
+                              ? null
+                              : () async {
+                                  final msg = await vm.login(
+                                    emailCtrl.text,
+                                    passCtrl.text,
+                                  );
+
+                                  if (msg != null) {
+                                    // ignore: use_build_context_synchronously
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(msg,
+                                            style: const TextStyle(
+                                                color: Colors.white)),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
+
+                                  Navigator.pushReplacement(
+                                    // ignore: use_build_context_synchronously
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const HomeScreen(),
+                                    ),
+                                  );
+                                },
+                          child: vm.isLoading
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : const Text(
+                                  "Login",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                         ),
                       ),
+
                       const SizedBox(height: 18),
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Don't have an account? "),
+                          const Text("Don't have an account? "),
                           GestureDetector(
                             onTap: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      const RegisterScreen(),
+                                  builder: (_) => const RegisterScreen(),
                                 ),
                               );
                             },
@@ -221,7 +227,7 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                ),
+                )
               ],
             ),
           ),

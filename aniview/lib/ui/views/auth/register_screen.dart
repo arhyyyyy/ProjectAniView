@@ -1,55 +1,17 @@
-// lib/ui/views/auth/register_screen.dart
-import 'package:aniview/ui/themes/colors.dart';
-import 'package:aniview/ui/views/auth/login_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+
+import '../../../ui/themes/colors.dart';
+import '../../../ui/viewmodels/register_viewmodel.dart';
+import 'login_screen.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
 
-  Future<void> register(BuildContext context, String name, String email, String password) async {
-    try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email.trim(),
-        password: password.trim(),
-      );
-      await userCredential.user!.updateDisplayName(name);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Registration successful!", style: TextStyle(color: Colors.white)),
-          backgroundColor: Colors.green,
-        ),
-      );
-      Future.delayed(const Duration(milliseconds: 400), () {
-        Navigator.pushReplacement(
-
-          context,
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
-        );
-      });
-    } on FirebaseAuthException catch (e) {
-      String message = "Something went wrong.";
-      if (e.code == "email-already-in-use") {
-        message = "Email is already registered.";
-      } else if (e.code == "invalid-email") {
-        message = "Invalid email format.";
-      } else if (e.code == "weak-password") {
-        message = "Password is too weak.";
-      }
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message, style: const TextStyle(color: Colors.white)),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final vm = context.watch<RegisterViewModel>();
+
     final nameCtrl = TextEditingController();
     final emailCtrl = TextEditingController();
     final passCtrl = TextEditingController();
@@ -62,15 +24,12 @@ class RegisterScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
               children: [
+                // HEADER
                 Padding(
                   padding: const EdgeInsets.only(bottom: 20),
                   child: Column(
                     children: [
-                      Image.asset(
-                        "assets/logo.png",
-                        width: 200,
-                        height: 200,
-                      ),
+                      Image.asset("assets/logo.png", width: 200, height: 200),
                       const SizedBox(height: 6),
                       Text(
                         "Create Account",
@@ -83,16 +42,18 @@ class RegisterScreen extends StatelessWidget {
                     ],
                   ),
                 ),
+
+                // FORM CONTAINER
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
+                    boxShadow: const [
                       BoxShadow(
                         color: Colors.black12,
                         blurRadius: 14,
-                        offset: const Offset(0, 6),
+                        offset: Offset(0, 6),
                       ),
                     ],
                   ),
@@ -107,23 +68,16 @@ class RegisterScreen extends StatelessWidget {
                           color: AppColors.navy,
                         ),
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        "Create a new account",
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: AppColors.black.withValues(alpha: .7),
-                        ),
-                      ),
                       const SizedBox(height: 28),
+
+                      // NAME
                       TextField(
                         controller: nameCtrl,
                         decoration: InputDecoration(
                           labelText: "Full Name",
                           filled: true,
                           fillColor: AppColors.bluePastel.withValues(alpha: .8),
-                          prefixIcon: Icon(Icons.person,
-                              color: AppColors.bluePrimary),
+                          prefixIcon: Icon(Icons.person, color: AppColors.bluePrimary),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
@@ -131,14 +85,15 @@ class RegisterScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
+
+                      // EMAIL
                       TextField(
                         controller: emailCtrl,
                         decoration: InputDecoration(
                           labelText: "Email",
                           filled: true,
                           fillColor: AppColors.bluePastel.withValues(alpha: .8),
-                          prefixIcon: Icon(Icons.email,
-                              color: AppColors.bluePrimary),
+                          prefixIcon: Icon(Icons.email, color: AppColors.bluePrimary),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
@@ -146,6 +101,8 @@ class RegisterScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
+
+                      // PASSWORD
                       TextField(
                         controller: passCtrl,
                         obscureText: true,
@@ -153,15 +110,17 @@ class RegisterScreen extends StatelessWidget {
                           labelText: "Password",
                           filled: true,
                           fillColor: AppColors.bluePastel.withValues(alpha: .8),
-                          prefixIcon: Icon(Icons.lock,
-                              color: AppColors.bluePrimary),
+                          prefixIcon: Icon(Icons.lock, color: AppColors.bluePrimary),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
                           ),
                         ),
                       ),
+
                       const SizedBox(height: 24),
+
+                      // BUTTON REGISTER
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -172,29 +131,58 @@ class RegisterScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(14),
                             ),
                           ),
-                          onPressed: () {
-                            register(
-                              context,
-                              nameCtrl.text,
-                              emailCtrl.text,
-                              passCtrl.text,
-                            );
-                          },
-                          child: const Text(
-                            "Register",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          onPressed: vm.isLoading
+                              ? null
+                              : () async {
+                                  bool ok = await vm.register(
+                                    nameCtrl.text,
+                                    emailCtrl.text,
+                                    passCtrl.text,
+                                  );
+
+                                  if (ok) {
+                                    // ignore: use_build_context_synchronously
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text("Registration successful!"),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                    Navigator.pushReplacement(
+                                      // ignore: use_build_context_synchronously
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (_) => const LoginScreen()),
+                                    );
+                                  } else {
+                                    // ignore: use_build_context_synchronously
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(vm.errorMessage ?? "Error occurred"),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
+                                },
+                          child: vm.isLoading
+                              ? const CircularProgressIndicator(color: Colors.white)
+                              : const Text(
+                                  "Register",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                         ),
                       ),
+
                       const SizedBox(height: 18),
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Already have an account? "),
+                          const Text("Already have an account? "),
                           GestureDetector(
                             onTap: () {
                               Navigator.pop(context);
@@ -206,7 +194,7 @@ class RegisterScreen extends StatelessWidget {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ),
+                          )
                         ],
                       ),
                     ],

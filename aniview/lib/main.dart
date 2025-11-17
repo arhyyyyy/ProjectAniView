@@ -1,10 +1,16 @@
 // lib/main.dart
+import 'package:aniview/data/repo/auth_repository.dart';
 import 'package:aniview/ui/splash/splashscreen.dart';
+import 'package:aniview/ui/viewmodels/login_viewmodel.dart';
+import 'package:aniview/ui/viewmodels/profile_viewmodel.dart';
+import 'package:aniview/ui/viewmodels/register_viewmodel.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'di/locator.dart';
 import 'ui/viewmodels/anime_viewmodel.dart';
+import 'ui/viewmodels/auth_viewmodel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,14 +29,22 @@ class AniLiveApp extends StatelessWidget {
         ChangeNotifierProvider<AnimeViewModel>(
           create: (_) => locator<AnimeViewModel>()..fetchTopAnime(),
         ),
+        ChangeNotifierProvider<AuthViewModel>(
+          create: (_) => locator<AuthViewModel>(),
+        ),
+        ChangeNotifierProvider<ProfileViewModel>(
+          create: (_) => locator<ProfileViewModel>(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => RegisterViewModel(locator<AuthRepository>()),
+        ),
+        ChangeNotifierProvider<LoginViewModel>(
+          create: (_) => LoginViewModel(locator<AuthRepository>()),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'AniLive',
-        theme: ThemeData(
-          primarySwatch: Colors.purple,
-          useMaterial3: true,
-        ),
         home: const SplashScreen(),
       ),
     );

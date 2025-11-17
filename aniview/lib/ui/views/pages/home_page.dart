@@ -1,4 +1,5 @@
 import 'package:aniview/ui/viewmodels/anime_viewmodel.dart';
+import 'package:aniview/ui/widgets/app_drawer.dart' show AppDrawer;
 import 'package:aniview/ui/widgets/latest_anime_grid.dart';
 import 'package:aniview/ui/widgets/search.dart';
 import 'package:aniview/ui/widgets/top_anime_grid.dart';
@@ -40,32 +41,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: AppColors.bluePastel,
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(color: AppColors.bluePastel),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset("assets/logo.png", width: 180, height: 180),
-                ],
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text(
-                "Logout",
-                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
+      drawer: const AppDrawer(),
       appBar: AppBar(
         backgroundColor: AppColors.bluePastel,
         elevation: 0,
